@@ -1,11 +1,7 @@
 import '../models/user_model.dart';
 
 /// Controlador responsável por gerir o fluxo de autenticação e dados de perfil do utilizador.
-///
-/// Fornece métodos assíncronos para ler o estado da conta atual e atualizar
-/// as informações sensíveis de registo ou dados demográficos na plataforma.
 class AutenticacaoController {
-  // Lógica de autenticação e gestão de perfil do utilizador
 
   /// Recupera os dados de perfil do utilizador atualmente autenticado na aplicação.
   ///
@@ -19,7 +15,11 @@ class AutenticacaoController {
   ///
   /// Recebe obrigatoriamente a [idade], o [contacto] telefónico e, opcionalmente,
   /// o [genero]. Retorna `true` se a operação for concluída com sucesso.
-  Future<bool> atualizarDadosPessoais({required String idade, required String contacto, required String? genero}) async {
+  Future<bool> atualizarDadosPessoais({
+    required String idade,
+    required String contacto,
+    required String? genero,
+  }) async {
     return true;
   }
 
@@ -33,8 +33,8 @@ class AutenticacaoController {
 
   /// Altera a palavra-passe de acesso do utilizador.
   ///
-  /// Recebe a [novaPassword] encriptada ou em texto limpo (dependendo da implementação),
-  /// retornando `true` após a validação e atualização bem-sucedida no servidor ou localmente.
+  /// Recebe a [novaPassword], retornando `true` após a validação e
+  /// atualização bem-sucedida no servidor ou localmente.
   Future<bool> atualizarPassword(String novaPassword) async {
     return true;
   }

@@ -5,81 +5,89 @@ import 'rotas_screen.dart';
 import 'historico_screen.dart';
 import 'perfil_screen.dart';
 
-/// Ecrã de navegação principal da aplicação (Host de Navegação).
+/// Contentor estrutural de navegação principal da aplicação (Shell).
 ///
-/// Atua como a estrutura base que aloja a barra de navegação inferior
-/// e faz a gestão da troca dinâmica entre os ecrãs principais do ecossistema.
+/// Organiza e faz a gestão dos cinco ecrãs base através de um [PageView]
+/// sincronizado com uma barra de navegação inferior [NavigationBar].
 class MainNavigationScreen extends StatefulWidget {
-  /// Cria uma instância estável de [MainNavigationScreen].
   const MainNavigationScreen({super.key});
 
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
-/// Estado associado ao ecrã [MainNavigationScreen] que monitoriza a aba ativa.
-///
-/// Controla o índice da vista atual e aplica uma transição suave animada
-/// de troca (fade) sempre que o utilizador seleciona um destino diferente.
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  /// O índice numérico que representa a aba ou ecrã atualmente visível.
-  int _currentIndex = 0;
+  int _indiceAtual = 0;
+  late PageController _pageController;
 
-  /// Coleção ordenada das subclasses de [Widget] correspondentes a cada destino.
-  final List<Widget> _screens = [
-    const DashboardScreen(),
-    const RotasScreen(),
-    const LojaScreen(),
-    const HistoricoScreen(),
-    const PerfilScreen(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _indiceAtual);
+  }
 
-  static const _corPrincipalAzul = Colors.indigo;
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  /// Altera a página ativa através de uma animação suave ao tocar nos itens da barra.
+  void _aoMudarDeAba(int indice) {
+    setState(() {
+      _indiceAtual = indice;
+    });
+    _pageController.animateToPage(
+      indice,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  /// Sincroniza o índice de seleção da barra inferior ao detetar o deslizar de ecrã (swipe).
+  void _aoDeslizarEcra(int indice) {
+    setState(() {
+      _indiceAtual = indice;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final cores = Theme.of(context).colorScheme;
-
     return Scaffold(
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 250),
-        switchInCurve: Curves.easeInOutCubic,
-        switchOutCurve: Curves.easeInOutCubic,
-        child: KeyedSubtree(
-          key: ValueKey<int>(_currentIndex),
-          child: _screens[_currentIndex],
-        ),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: _aoDeslizarEcra,
+        physics: const ClampingScrollPhysics(),
+        children: const [
+          DashboardScreen(),
+          RotasScreen(),
+          LojaScreen(),
+          HistoricoScreen(),
+          PerfilScreen(),
+        ],
       ),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        backgroundColor: cores.surface,
-        indicatorColor: _corPrincipalAzul.withValues(alpha: 0.15),
-        onDestinationSelected: (index) => setState(() => _currentIndex = index),
+        selectedIndex: _indiceAtual,
+        onDestinationSelected: _aoMudarDeAba,
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.directions_walk_rounded, color: Colors.grey),
-            selectedIcon: Icon(Icons.directions_walk_rounded, color: _corPrincipalAzul),
-            label: 'Passos',
+            icon: Icon(Icons.directions_walk_rounded),
+            label: 'Atividade',
           ),
           NavigationDestination(
-            icon: Icon(Icons.explore_outlined, color: Colors.grey),
-            selectedIcon: Icon(Icons.explore, color: _corPrincipalAzul),
-            label: 'Trilhos',
+            icon: Icon(Icons.map_rounded),
+            label: 'Rotas',
           ),
           NavigationDestination(
-            icon: Icon(Icons.store_outlined, color: Colors.grey),
-            selectedIcon: Icon(Icons.store, color: _corPrincipalAzul),
+            icon: Icon(Icons.shopping_bag_rounded),
             label: 'Loja',
           ),
           NavigationDestination(
-            icon: Icon(Icons.history_rounded, color: Colors.grey),
-            selectedIcon: Icon(Icons.history_toggle_off_rounded, color: _corPrincipalAzul),
+            icon: Icon(Icons.history_rounded),
             label: 'Histórico',
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline_rounded, color: Colors.grey),
-            selectedIcon: Icon(Icons.person_rounded, color: _corPrincipalAzul),
+            icon: Icon(Icons.person_rounded),
             label: 'Perfil',
           ),
         ],

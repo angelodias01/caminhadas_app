@@ -4,6 +4,8 @@
 <dict>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Esta aplicação necessita de aceder à galeria para alterar a sua imagem de perfil.</string>
+    <key>NSMotionUsageDescription</key>
+    <string>Esta aplicação necessita de aceder ao pedómetro para contar os teus passos e converter em pontos.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

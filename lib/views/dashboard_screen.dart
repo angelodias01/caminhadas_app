@@ -1,41 +1,34 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:health/health.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../controllers/atividade_controller.dart';
 
 /// Ecrã principal de resumo de atividade do utilizador (Dashboard).
 ///
-/// Apresenta de forma visual e animada o progresso diário de passos do utilizador,
-/// a conversão correspondente em quilómetros e os pontos de mérito acumulados.
+/// Apresenta graficamente o progresso diário de passos, pontos acumulados
+/// e distância estimada em quilómetros, com animações de entrada.
 class DashboardScreen extends StatefulWidget {
-  /// Cria uma instância estável de [DashboardScreen].
   const DashboardScreen({super.key});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-/// Estado associado ao ecrã [DashboardScreen] que gere os controladores de animação.
-///
-/// Implementa [SingleTickerProviderStateMixin] para alimentar as transições fluidas
-/// de escala e opacidade no carregamento inicial dos dados.
 class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProviderStateMixin {
-  /// Instância do controlador de negócio para calcular pontos e distâncias.
   final AtividadeController _atividadeController = AtividadeController();
+  int _passosAtuais = 0;
+  StreamSubscription<int>? _subscricaoPassos;
 
-  /// Contador temporário de passos registados no dia atual.
-  final int _passosAtuais = 0;
-
-  /// Controlador mestre do ciclo de vida das animações do ecrã.
   late AnimationController _animationController;
-
-  /// Animação encarregue de aplicar o efeito de crescimento (escala) no anel central.
   late Animation<double> _scaleAnimation;
-
-  /// Animação encarregue de esbater (fade-in) os elements informativos textuais e cartões.
   late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
+    _verificarEPedirPermissao();
+
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -52,8 +45,74 @@ class _DashboardScreenState extends State<DashboardScreen> with SingleTickerProv
     _animationController.forward();
   }
 
+  /// Verifica o estado da permissão de atividade física antes de iniciar os fluxos de escuta.
+  Future<void> _verificarEPedirPermissao() async {
+    try {
+      PermissionStatus status = await Permission.activityRecognition.status;
+      if (!status.isGranted) {
+        status = await Permission.activityRecognition.request();
+      }
+      _iniciarContagemDePassos();
+    } catch (_) {
+      _iniciarContagemDePassos();
+    }
+  }
+
+  /// Inicializa a contagem carregando dados da cache ou do Health Connect e abre a subscrição de streams.
+  void _iniciarContagemDePassos() async {
+    if (_subscricaoPassos != null) {
+      _subscricaoPassos!.cancel();
+      _subscricaoPassos = null;
+    }
+
+    int passosRecuperados = 0;
+
+    try {
+      Health conexaoHealth = Health();
+      bool podeSincronizar = await conexaoHealth.isHealthConnectAvailable();
+
+      if (podeSincronizar) {
+        passosRecuperados = await _atividadeController.sincronizarEObterPassosDoSistema();
+      } else {
+        passosRecuperados = await _atividadeController.carregarPassosGuardados();
+      }
+    } catch (_) {
+      passosRecuperados = await _atividadeController.carregarPassosGuardados();
+    }
+
+    if (mounted) {
+      setState(() {
+        _passosAtuais = passosRecuperados;
+      });
+    }
+
+    _subscricaoPassos = _atividadeController.obterFluxoDePassos.listen(
+      _noEventoPassos,
+      onError: _noErroPassos,
+    );
+  }
+
+  /// Callback executado a cada nova leitura validada pelo controlador de passos.
+  void _noEventoPassos(int passos) {
+    if (mounted) {
+      setState(() {
+        _passosAtuais = passos;
+      });
+    }
+  }
+
+  /// Fallback de segurança para interrupções abruptas nos sensores de telemetria.
+  void _noErroPassos(Object error) {
+    if (mounted) {
+      setState(() {
+        _passosAtuais = 0;
+      });
+    }
+  }
+
   @override
   void dispose() {
+    _subscricaoPassos?.cancel();
     _animationController.dispose();
     super.dispose();
   }
