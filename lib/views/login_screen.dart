@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'main_navigation_screen.dart';
 import 'registo_screen.dart';
-import '../main.dart';
 
 /// Ecrã inicial de autenticação (Login) da aplicação.
 ///

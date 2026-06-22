@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'main_navigation_screen.dart';
-import '../main.dart';
 
 /// Ecrã responsável pelo registo e criação de novas contas de utilizador.
 ///

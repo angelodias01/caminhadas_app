@@ -264,29 +264,32 @@ class _PerfilScreenState extends State<PerfilScreen> {
               color: cores.surfaceContainerLow,
               borderRadius: BorderRadius.circular(24),
             ),
-            child: Column(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.mail_outline_rounded, color: _corPrincipalAzul),
-                  title: const Text('Alterar E-mail', style: TextStyle(fontWeight: FontWeight.w500)),
-                  trailing: Icon(Icons.chevron_right_rounded, color: cores.onSurfaceVariant),
-                  onTap: () => _abrirSobreposicaoEdicao(context, 'email'),
-                ),
-                Divider(height: 1, indent: 16, endIndent: 16, color: cores.outlineVariant.withValues(alpha: 0.3)),
-                ListTile(
-                  leading: const Icon(Icons.lock_open_rounded, color: _corPrincipalAzul),
-                  title: const Text('Alterar Password', style: TextStyle(fontWeight: FontWeight.w500)),
-                  trailing: Icon(Icons.chevron_right_rounded, color: cores.onSurfaceVariant),
-                  onTap: () => _abrirSobreposicaoEdicao(context, 'password'),
-                ),
-                Divider(height: 1, indent: 16, endIndent: 16, color: cores.outlineVariant.withValues(alpha: 0.3)),
-                ListTile(
-                  leading: const Icon(Icons.tune_rounded, color: _corPrincipalAzul),
-                  title: const Text('Outros Dados da Conta', style: TextStyle(fontWeight: FontWeight.w500)),
-                  trailing: Icon(Icons.chevron_right_rounded, color: cores.onSurfaceVariant),
-                  onTap: () => _abrirSobreposicaoEdicao(context, 'dados'),
-                ),
-              ],
+            child: Material(
+              type: MaterialType.transparency,
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.mail_outline_rounded, color: _corPrincipalAzul),
+                    title: const Text('Alterar E-mail', style: TextStyle(fontWeight: FontWeight.w500)),
+                    trailing: Icon(Icons.chevron_right_rounded, color: cores.onSurfaceVariant),
+                    onTap: () => _abrirSobreposicaoEdicao(context, 'email'),
+                  ),
+                  Divider(height: 1, indent: 16, endIndent: 16, color: cores.outlineVariant.withValues(alpha: 0.3)),
+                  ListTile(
+                    leading: const Icon(Icons.lock_open_rounded, color: _corPrincipalAzul),
+                    title: const Text('Alterar Password', style: TextStyle(fontWeight: FontWeight.w500)),
+                    trailing: Icon(Icons.chevron_right_rounded, color: cores.onSurfaceVariant),
+                    onTap: () => _abrirSobreposicaoEdicao(context, 'password'),
+                  ),
+                  Divider(height: 1, indent: 16, endIndent: 16, color: cores.outlineVariant.withValues(alpha: 0.3)),
+                  ListTile(
+                    leading: const Icon(Icons.tune_rounded, color: _corPrincipalAzul),
+                    title: const Text('Outros Dados da Conta', style: TextStyle(fontWeight: FontWeight.w500)),
+                    trailing: Icon(Icons.chevron_right_rounded, color: cores.onSurfaceVariant),
+                    onTap: () => _abrirSobreposicaoEdicao(context, 'dados'),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -302,7 +305,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   secondary: const Icon(Icons.dark_mode_outlined, color: _corPrincipalAzul),
                   title: const Text('Modo Escuro', style: TextStyle(fontWeight: FontWeight.w500)),
                   value: stateApp?.isDarkMode ?? false,
-                  activeColor: _corPrincipalAzul,
+                  activeThumbColor: _corPrincipalAzul,
                   onChanged: (bool value) {
                     stateApp?.alternarTema();
                   },
@@ -466,7 +469,7 @@ class _ConteudoFormularioModalState extends State<_ConteudoFormularioModal> {
         ),
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
-          value: _genero,
+          initialValue: _genero,
           decoration: InputDecoration(
             labelText: 'Género',
             filled: true,
